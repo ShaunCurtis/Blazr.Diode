@@ -17,7 +17,7 @@ public class DiodeStore<T>
     private Task _task = Task.CompletedTask;
     private TaskCompletionSource<T> _queueTaskSource = new();
     private readonly Queue<DiodeMutationDelegate<T>> _mutationQueue = new();
-    private T _item;
+    private T _item = new();
 
     /// <summary>
     /// Event raised when an entity mutates
