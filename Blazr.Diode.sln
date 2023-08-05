@@ -5,7 +5,12 @@ VisualStudioVersion = 17.6.33829.357
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazr.Diode.Server.Web", "Blazr.Diode.Server.Web\Blazr.Diode.Server.Web.csproj", "{9075DD7C-1E63-4779-9CEB-033672A736BE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazr.Diode", "Blazr.Diode\Blazr.Diode.csproj", "{6C0A16FB-D39A-496B-9E24-040C8CEFD759}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazr.Diode", "Blazr.Diode\Blazr.Diode.csproj", "{6C0A16FB-D39A-496B-9E24-040C8CEFD759}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{895FFDAE-0CA8-4252-AE04-4C32E97C6D6C}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

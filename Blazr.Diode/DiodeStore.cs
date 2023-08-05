@@ -46,9 +46,9 @@ public class DiodeStore<T>
     /// Requires a state object to populate
     /// </summary>
     /// <param name="entity"></param>
-    public DiodeStore(T item)
+    public DiodeStore()
     {
-        _item = item;
+        _item = new();
         this.Item = _item;
         _taskCompletionSource.SetResult(this.Item);
         this.LastActivity = DateTimeOffset.Now;

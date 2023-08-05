@@ -10,5 +10,7 @@ public interface IDiodeHandler<T, TAction>
     where T : class
     where TAction : class, IDiodeAction
 {
+    public TAction Action { get; set; }
+
     public Task<DiodeMutationResult<T>> MutateAsync(DiodeMutationRequest<T> request);
 }

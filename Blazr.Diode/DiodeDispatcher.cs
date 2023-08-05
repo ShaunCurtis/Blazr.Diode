@@ -31,6 +31,7 @@ public class DiodeDispatcher
         if (handler is null)
             return DiodeMutationResult<T>.Failure($"Could not locate a registered handler for {typeof(TAction).Name}");
 
+        handler.Action = action;
 
         // Gets the DI registered store from the DI Provider
         var store = _serviceProvider.GetService<DiodeStore<T>>();

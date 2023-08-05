@@ -1,6 +1,5 @@
+using Blazr.Diode.Server.Web.Counter;
 using Blazr.Diode.Server.Web.Data;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
+builder.Services.AddCounterServices();
 
 var app = builder.Build();
 
