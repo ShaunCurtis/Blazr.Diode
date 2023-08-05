@@ -14,8 +14,8 @@ namespace Blazr.Diode;
 public class DiodeStore<T>
     where T : class, new()
 {
-    private Task _queueTask = Task.CompletedTask;
-    private TaskCompletionSource<T> _taskCompletionSource = new();
+    private Task _task = Task.CompletedTask;
+    private TaskCompletionSource<T> _queueTaskSource = new();
     private readonly Queue<DiodeMutationDelegate<T>> _mutationQueue = new();
     private T _item;
 
@@ -27,19 +27,20 @@ public class DiodeStore<T>
     /// <summary>
     /// The current OwsEntityData object for the entity
     /// </summary>
-    public T Item { get; private set; }
+    public T Item
+    {
+        get => _item;
+        private set
+        {
+            _item = value;
+        }
+    }
 
     /// <summary>
     /// The Task that represents current state mutation activity
     /// If it not completed then a mutatiuon is taking place
     /// </summary>
-    public Task<T> StateMutationTask => _taskCompletionSource.Task;
-
-    /// <summary>
-    /// The last access/mutation activity on the State
-    /// Used by the mian state object to determine when to dispose the entity state
-    /// </summary>
-    internal DateTimeOffset LastActivity = DateTimeOffset.Now;
+    public Task<T> QueueTask => _queueTaskSource.Task;
 
     /// <summary>
     /// Constructor
@@ -48,10 +49,8 @@ public class DiodeStore<T>
     /// <param name="entity"></param>
     public DiodeStore()
     {
-        _item = new();
-        this.Item = _item;
-        _taskCompletionSource.SetResult(this.Item);
-        this.LastActivity = DateTimeOffset.Now;
+        this.Item = new();
+        _queueTaskSource.SetResult(this.Item);
     }
 
     /// <summary>
@@ -59,35 +58,32 @@ public class DiodeStore<T>
     /// </summary>
     /// <param name="mutation">The OwsStateMutationDelegate to run to mutate the object</param>
     /// <returns></returns>
-    public Task<T> DispatchAsync(DiodeMutationDelegate<T> mutation)
+    public Task<T> QueueAsync(DiodeMutationDelegate<T> mutation)
     {
         _mutationQueue.Enqueue(mutation);
 
         // Start the Queue service if it's not already running
-        if (_queueTask.IsCompleted)
-            _queueTask = ServiceQueueAsync();
+        if (_task.IsCompleted)
+            _task = StartQueueAsync();
 
-        return this.StateMutationTask;
+        return this.QueueTask;
     }
 
-    private async Task ServiceQueueAsync()
+    private async Task StartQueueAsync()
     {
-        _taskCompletionSource = new();
+        _queueTaskSource = new();
 
         while (_mutationQueue.Count > 0)
         {
             var acton = _mutationQueue.Dequeue();
             var result = await acton.Invoke(new(_item));
+
             if (result.Successful && result.Item is not null)
-            {
-                _item = result.Item;
-                this.Item = _item;
-            }
+                this.Item = result.Item;
         }
 
-        _taskCompletionSource?.SetResult(this.Item);
-        LastActivity = DateTimeOffset.Now;
-        
+        _queueTaskSource?.SetResult(this.Item);
+
         NotifyStateHasChanged(this.Item);
     }
 

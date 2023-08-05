@@ -11,6 +11,5 @@ public interface IDiodeHandler<T, TAction>
     where TAction : class, IDiodeAction
 {
     public TAction Action { get; set; }
-
-    public Task<DiodeMutationResult<T>> MutateAsync(DiodeMutationRequest<T> request);
+    public DiodeMutationDelegate<T> Mutation { get; }
 }

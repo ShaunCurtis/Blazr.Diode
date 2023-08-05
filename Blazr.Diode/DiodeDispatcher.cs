@@ -28,25 +28,21 @@ public class DiodeDispatcher
         // Gets the DI registered action from the DI Provider
         var handler = _serviceProvider.GetService<IDiodeHandler<T, TAction>>();
 
+        // deal with a null Handler
         if (handler is null)
             return DiodeMutationResult<T>.Failure($"Could not locate a registered handler for {typeof(TAction).Name}");
-
-        var isDisposable = handler is IDisposable || (handler is IAsyncDisposable;
-        if (isDisposable)
-        {
-            var type = handler.GetType();
-            var h = ActivatorUtilities.CreateInstance(_serviceProvider, type);
-        }
 
         handler.Action = action;
 
         // Gets the DI registered store from the DI Provider
         var store = _serviceProvider.GetService<DiodeStore<T>>();
 
+        // deal with a null store
         if (store is null)
             return DiodeMutationResult<T>.Failure($"Could not locate a registered store for {typeof(T).Name}");
 
-        var mutatedT = await store.DispatchAsync(handler.MutateAsync);
+        // Queues the DiodeMutationDelegate onto the store's mutation queue
+        var mutatedT = await store.QueueAsync(handler.Mutation);
 
         return DiodeMutationResult<T>.Success(mutatedT);
     }
@@ -64,11 +60,13 @@ public class DiodeDispatcher
         // Gets the DI registered store from the DI Provider
         var store = _serviceProvider.GetService<DiodeStore<T>>();
 
+        // deal with a null store
         if (store is null)
             return DiodeMutationResult<T>.Failure($"Could not locate a registered store for {typeof(T).Name}");
 
-        var mutatedT = await store.DispatchAsync(mutationDelegate);
+        var mutatedT = await store.QueueAsync(mutationDelegate);
 
+        // Queues the DiodeMutationDelegate onto the store's mutation queue
         return DiodeMutationResult<T>.Success(mutatedT);
     }
 }

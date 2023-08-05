@@ -6,6 +6,6 @@ public static class CounterServices
     {
         services.AddScoped<DiodeStore<CounterData>>();
         services.AddScoped<DiodeDispatcher>();
-        services.AddScoped<IDiodeHandler<CounterData,CounterIncrementAction>, CounterIncrementHandler>();
+        services.AddTransient<IDiodeHandler<CounterData,CounterIncrementAction>, CounterIncrementHandler>();
     }
 }

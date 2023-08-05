@@ -2,7 +2,7 @@
 
 public record CounterIncrementAction : IDiodeAction
 {
-    public string Name => "Increment Counter by x";
+    public string Name => $"Increment by {this.IncrementBy}";
 
     public int IncrementBy { get; init; } = 1;    
 }
