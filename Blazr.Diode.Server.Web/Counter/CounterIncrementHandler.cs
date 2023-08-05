@@ -1,6 +1,4 @@
-﻿using Blazr.Diode.Server.Web.Data;
-
-namespace Blazr.Diode.Server.Web.Counter;
+﻿namespace Blazr.Diode.Server.Web.Counter;
 
 public class CounterIncrementHandler : IDiodeHandler<CounterData, CounterIncrementAction>
 {
@@ -11,6 +9,6 @@ public class CounterIncrementHandler : IDiodeHandler<CounterData, CounterIncreme
         ArgumentNullException.ThrowIfNull(Action);
 
         var result = request.Item with { Counter = request.Item.Counter + Action.IncrementBy };
-        return Task.FromResult( DiodeMutationResult<CounterData>.Success(result));
+        return Task.FromResult(DiodeMutationResult<CounterData>.Success(result));
     }
 }

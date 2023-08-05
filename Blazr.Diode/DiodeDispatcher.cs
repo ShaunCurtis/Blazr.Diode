@@ -31,6 +31,13 @@ public class DiodeDispatcher
         if (handler is null)
             return DiodeMutationResult<T>.Failure($"Could not locate a registered handler for {typeof(TAction).Name}");
 
+        var isDisposable = handler is IDisposable || (handler is IAsyncDisposable;
+        if (isDisposable)
+        {
+            var type = handler.GetType();
+            var h = ActivatorUtilities.CreateInstance(_serviceProvider, type);
+        }
+
         handler.Action = action;
 
         // Gets the DI registered store from the DI Provider
