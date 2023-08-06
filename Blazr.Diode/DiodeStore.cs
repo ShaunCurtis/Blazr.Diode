@@ -15,7 +15,7 @@ public class DiodeStore<T>
     where T : class, new()
 {
     private Task _task = Task.CompletedTask;
-    private TaskCompletionSource<T> _queueTaskSource = new();
+    private TaskCompletionSource<T> _queueLoopTaskSource = new();
     private readonly Queue<DiodeMutationDelegate<T>> _mutationQueue = new();
     private T _item = new();
 
@@ -40,7 +40,7 @@ public class DiodeStore<T>
     /// The Task that represents current state mutation activity
     /// If it not completed then a mutatiuon is taking place
     /// </summary>
-    public Task<T> QueueTask => _queueTaskSource.Task;
+    public Task<T> QueueLoopTask => _queueLoopTaskSource.Task;
 
     /// <summary>
     /// Constructor
@@ -50,7 +50,7 @@ public class DiodeStore<T>
     public DiodeStore()
     {
         this.Item = new();
-        _queueTaskSource.SetResult(this.Item);
+        _queueLoopTaskSource.SetResult(this.Item);
     }
 
     /// <summary>
@@ -64,14 +64,14 @@ public class DiodeStore<T>
 
         // Start the Queue service if it's not already running
         if (_task.IsCompleted)
-            _task = StartQueueAsync();
+            _task = StartQueueLoopAsync();
 
-        return this.QueueTask;
+        return this.QueueLoopTask;
     }
 
-    private async Task StartQueueAsync()
+    private async Task StartQueueLoopAsync()
     {
-        _queueTaskSource = new();
+        _queueLoopTaskSource = new();
 
         while (_mutationQueue.Count > 0)
         {
@@ -82,7 +82,7 @@ public class DiodeStore<T>
                 this.Item = result.Item;
         }
 
-        _queueTaskSource?.SetResult(this.Item);
+        _queueLoopTaskSource?.SetResult(this.Item);
 
         NotifyStateHasChanged(this.Item);
     }

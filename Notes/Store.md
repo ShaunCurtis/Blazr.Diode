@@ -24,16 +24,16 @@ public class DiodeStore<T>
 }
 ```
 
-The heart of the store is the Store queue, and the queue service process.
+At the heart of the store is the store queue, and the store loop process.
 
 ```csharp
     private readonly Queue<DiodeMutationDelegate<T>> _mutationQueue = new();
 ```
 
-And a `TaskCompletionSource<T>`
+And a `TaskCompletionSource<T>` that provides the async context for the loop.
 
 ```csharp
-    private TaskCompletionSource<T> _queueTaskSource = new();
+    private TaskCompletionSource<T> _queueLoopTaskSource = new();
 ```
 
 When `QueueAsync` is called:
@@ -44,39 +44,33 @@ When `QueueAsync` is called:
 
 It:
 
-1. Adds the `DiodeMutationDelegate<T>` to the queue:
+1. Adds the provided `DiodeMutationDelegate<T>` to the queue:
 
 ```csharp
    _mutationQueue.Enqueue(mutation);
 ```
 
-2. Checks if the queue is not running - `_queueTask` is completed.  If it isn't, it starts it and assigns the Task it returns to `_queueTask`.
+2. Checks the queue status: is `_queueLoopTask` completed?  It starts it if it isn't and assigns the Task it returns to `_queueLoopTask`.
 
 ```csharp
-    if (_queueTask.IsCompleted)
-        _queueTask = StartQueueAsync();
+    if (_queueLoopTask.IsCompleted)
+        _queueLoopTask = StartQueueLoopAsync();
 ```
 
-3. Finally it returns the `QueueTask`
+3. Finally it returns the `QueueLoopTask`, the task associated with `_queueLoopTaskSource`.
 
 ```csharp
         return this.QueueTask;
 ```
 
- which is the Task associated with `_queueTaskSource`
-
- ```csharp
-     public Task<T> QueueTask => _queueTaskSource.Task;
-```
-
 The key point to note here is that the task returned to the process that queued the delegate gets the task associated with thw queue process.  It doesn't complete until the queue process completes, and therefore, if it's a UI event, it doesn't complete and update the UI until the queue completes.
 
-### StartQueueAsync
+### StartQueueLoopAsync
 
-`StartQueueAsync` creates a new `TaskCompletionSource<T>`:
+`StartQueueLoopAsync` creates a new `TaskCompletionSource<T>`:
 
 ```csharp
-    _queueTaskSource = new();
+    _queueLoopTaskSource = new();
 ```
 
 And then loops through the queue processing routine.
