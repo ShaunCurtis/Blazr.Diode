@@ -1,13 +1,14 @@
 # Blazr.Diode
 
-Diode is a simple async unidirectional state management implementation based on the **Flux** pattern.
+Diode is an asynchronous state management system based on the **Flux** pattern.
+
 
 ![Diode Data Flow](./images/diode-dataflow.png)
 
 
-Players, such as Presentation layer services, Views or backend services create an `Action` instance, populate it with the relevant data and *Dispatch* to the `Dispatcher`.
+Players are front end services such presenters or views, or backend services interfaces to external services.  They create `Action` instances populated with the relevant mutation data and *Dispatch* the action to the `Dispatcher`.
 
-The dispatcher manually injects the handler that matches the store type and action type, sets the action instance and passes the `MutateAsync` as a `DiodeMutationDelegate` to the store.
+The dispatcher's job is to resolve the correct handler and queue for the action and dispatch it on.  In this implementation it resolves the registered handle service from the DI container, sets the action instance on the handler, and queues the handler's `Mutate` property delegate on the relevant store's mutation queue.
 
 The store executes the delegate, returns a `DiodeMutationResult` and raises the `StateHasChanged` to notify any listeners.
 
