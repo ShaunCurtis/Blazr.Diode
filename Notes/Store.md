@@ -24,7 +24,7 @@ public class DiodeStore<T>
 }
 ```
 
-The heart of the store is the Store queue, and the queue service process.
+The heart of the store is the Store queue, and the queue loop.
 
 ```csharp
     private readonly Queue<DiodeMutationDelegate<T>> _mutationQueue = new();
@@ -81,59 +81,41 @@ The key point to note here is that the task returned to the process that queued 
 
 And then loops through the queue processing routine.
 
-It gets thw action from the queue:
+It gets the action from the queue:
 
 ```csharp
     var acton = _mutationQueue.Dequeue();
 ```
 
-Invokes it 
+Invokes it:
+
 ```csharp
     var result = await acton.Invoke(new(_item));
 
 ```
 
-And if it's successful, assigns the new value to 
+And if it's successful, assigns the new value to `Item`
+
 ```csharp
     if (result.Successful && result.Item is not null)
         this.Item = result.Item;
 ```
 
-
-
-
-When the status of the task associated with this *Not Completed*, the queue process is running i.e. it is processing a `DiodeMutationDelegate` in the queue.  `_taskCompletionSource` is set to completed, and the Task associated completes, when the queue process has completed and the queue is empty.
-
-
-
-  There queue service is controlled by a `TaskCompletionSource`.  when the queue service stsrts it sets `_taskCompletionSource` to a new running task.  it then runs any `DiodeMutationDelegate` delegates on the queue and sets `_taskCompletionSource` to completed.  Any new delegates queued while the queue servie loop is running are run in the batch.
+Once it's processed all the items in the queue it Sets the Task source to complete:
 
 ```csharp
-    private Task _queueTask = Task.CompletedTask;
-    private TaskCompletionSource<T> _taskCompletionSource = new();
-    private readonly Queue<DiodeMutationDelegate<T>> _mutationQueue = new();
-    private T _item;
-
-    private async Task StartQueueAsync()
-    {
-        _taskCompletionSource = new();
-
-        while (_mutationQueue.Count > 0)
-        {
-            var acton = _mutationQueue.Dequeue();
-            var result = await acton.Invoke(new(_item));
-            if (result.Successful && result.Item is not null)
-            {
-                _item = result.Item;
-                this.Item = _item;
-            }
-        }
-
-        _taskCompletionSource?.SetResult(this.Item);
-        LastActivity = DateTimeOffset.Now;
-        
-        NotifyStateHasChanged(this.Item);
-    }
-
+    _queueTaskSource?.SetResult(this.Item);
 ```
+
+And then raised the `StateHasChanged` event.
+
+```csharp
+    NotifyStateHasChanged(this.Item);
+```
+
+```csharp
+    private void NotifyStateHasChanged(T? item)
+        => this.StateHasChanged?.Invoke(this, new DiodeStateChangeEventArgs(item));
+```
+
 

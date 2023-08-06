@@ -11,6 +11,7 @@ The dispatcher manually injects the handler that matches the store type and acti
 
 The store executes the delegate, returns a `DiodeMutationResult` and raises the `StateHasChanged` to notify any listeners.
 
+[Doumentstion Notes](./Notes/readme.md)
 
 The accompanying project demonstrates a simple  `Counter` page implementation.
 
