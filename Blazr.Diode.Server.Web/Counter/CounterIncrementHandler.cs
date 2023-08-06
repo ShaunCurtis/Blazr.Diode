@@ -3,7 +3,7 @@
 public class CounterIncrementHandler : IDiodeHandler<CounterData, CounterIncrementAction>
 {
     public CounterIncrementAction Action { get; set; } = default!;
-    public DiodeMutationDelegate<CounterData>? Mutation => MutateAsync;
+    public DiodeMutationDelegate<CounterData> Mutation => MutateAsync;
 
     public Task<DiodeMutationResult<CounterData>> MutateAsync(DiodeMutationRequest<CounterData> request)
     {

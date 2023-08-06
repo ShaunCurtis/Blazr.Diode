@@ -12,6 +12,7 @@ The dispatcher's job is to resolve the correct handler and queue for the action 
 
 The store executes the delegate, returns a `DiodeMutationResult` and raises the `StateHasChanged` to notify any listeners.
 
+[Doumentstion Notes](./Notes/readme.md)
 
 The accompanying project demonstrates a simple  `Counter` page implementation.
 
