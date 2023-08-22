@@ -14,4 +14,4 @@ namespace Blazr.Diode;
 /// <typeparam name="TEntity"></typeparam>
 /// <param name="entity"></param>
 /// <returns></returns>
-public delegate Task<DiodeMutationResult<T>> DiodeMutationDelegate<T>(DiodeMutationRequest<T> request) where T : class;
+public delegate Task<DiodeResult<T>> DiodeMutationDelegate<T>(DiodeMutationRequest<T> request) where T : class;

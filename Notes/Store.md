@@ -3,7 +3,7 @@
 The store:
 
 1. Holds the *Single Version of the Truth*.
-2. Mutates the store item.
+2. Mutates the *Single Version of the Truth*.
 3. Notifies when a mutation is complete. 
 
 The class skeleton looks like this:
@@ -14,23 +14,36 @@ public class DiodeStore<T>
 {
     // Event that any listener can subscribe to for mutations
     public event EventHandler<DiodeStateChangeEventArgs>? StateHasChanged;
+
     // The current version of the truth
-    public T Item { get; private set; }
+    public T Item
+    {
+        get => _item;
+        private set
+        {
+            _item = value;
+        }
+    }
+
     // Queue Task.  If it's Completed then no queue event is currently running
-    public Task<T> QueueTask => _queueTaskSource.Task;
+    public Task<T> QueueLoopTask => _queueLoopTaskSource.Task;
 
     // Method to queue a mutation event.  If the queue isn't running it will start the queue
     public Task<T> QueueAsync(DiodeMutationDelegate<T> mutation);
 }
 ```
 
-The heart of the store is the Store queue, and the queue loop.
+The beating heart of the store is the Store queue, and the queue loop.
+
+The queue loop only runs when there are active items in the queue.  It's on/off state is controlled by a `TaskCompletionSource`.
+
+The queue is an private `readonly` `Queue<T>`.
 
 ```csharp
     private readonly Queue<DiodeMutationDelegate<T>> _mutationQueue = new();
 ```
 
-And a `TaskCompletionSource<T>` that provides the async context for the loop.
+The `TaskCompletionSource<T>` that provides the async context for the loop.
 
 ```csharp
     private TaskCompletionSource<T> _queueLoopTaskSource = new();

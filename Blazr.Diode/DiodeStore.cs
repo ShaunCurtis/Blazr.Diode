@@ -19,6 +19,8 @@ public class DiodeStore<T>
     private readonly Queue<DiodeMutationDelegate<T>> _mutationQueue = new();
     private T _item = new();
 
+    protected bool IsMutated;
+
     /// <summary>
     /// Event raised when an entity mutates
     /// </summary>
@@ -47,9 +49,9 @@ public class DiodeStore<T>
     /// Requires a state object to populate
     /// </summary>
     /// <param name="entity"></param>
-    public DiodeStore()
+    public DiodeStore(T? item = null)
     {
-        this.Item = new();
+        this.Item = item ?? new();
         _queueLoopTaskSource.SetResult(this.Item);
     }
 
@@ -69,6 +71,10 @@ public class DiodeStore<T>
         return this.QueueLoopTask;
     }
 
+    protected virtual Task OnQueueCompleted()
+        => Task.CompletedTask;
+    
+
     private async Task StartQueueLoopAsync()
     {
         _queueLoopTaskSource = new();
@@ -81,6 +87,10 @@ public class DiodeStore<T>
             if (result.Successful && result.Item is not null)
                 this.Item = result.Item;
         }
+
+        this.IsMutated = true;
+
+        await this.OnQueueCompleted();
 
         _queueLoopTaskSource?.SetResult(this.Item);
 

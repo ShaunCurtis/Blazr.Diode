@@ -5,11 +5,11 @@ public class CounterIncrementHandler : IDiodeHandler<CounterData, CounterIncreme
     public CounterIncrementAction Action { get; set; } = default!;
     public DiodeMutationDelegate<CounterData> Mutation => MutateAsync;
 
-    public Task<DiodeMutationResult<CounterData>> MutateAsync(DiodeMutationRequest<CounterData> request)
+    public Task<DiodeResult<CounterData>> MutateAsync(DiodeMutationRequest<CounterData> request)
     {
         ArgumentNullException.ThrowIfNull(Action);
 
         var result = request.Item with { Counter = request.Item.Counter + Action.IncrementBy };
-        return Task.FromResult(DiodeMutationResult<CounterData>.Success(result));
+        return Task.FromResult(DiodeResult<CounterData>.Success(result));
     }
 }
