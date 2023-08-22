@@ -6,10 +6,10 @@
 
 namespace Blazr.Diode;
 
-/// <summary>
-/// Interface defining a Mustation Request
-/// </summary>
-public interface IDiodeAction
+public interface IDiodeHandler<T, TAction>
+    where T : class
+    where TAction : class, IDiodeAction
 {
-    string Name { get; }
+    public TAction? Action { get; set; }
+    public DiodeAsyncMutationDelegate<T> Mutation { get; }
 }

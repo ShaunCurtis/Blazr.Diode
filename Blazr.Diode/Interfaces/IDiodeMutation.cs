@@ -6,10 +6,9 @@
 
 namespace Blazr.Diode;
 
-public interface IDiodeHandler<T, TAction>
+public interface IDiodeMutation<T>
     where T : class
-    where TAction : class, IDiodeAction
 {
-    public TAction Action { get; set; }
-    public DiodeMutationDelegate<T> Mutation { get; }
+    string ActionName { get; }
+    public DiodeAsyncMutationDelegate<T> Mutation { get; }
 }

@@ -4,11 +4,13 @@
 /// If you use it, donate something to a charity somewhere
 /// ============================================================
 
-namespace Blazr.Diode.Server.Web.Counter;
+namespace Blazr.Diode;
 
-public record CounterData : IDiodeEntity
+/// <summary>
+/// Interface defining a Mustation Request
+/// </summary>
+public interface IDiodeAction
 {
-    public int Counter { get; init; }
-    public int Incrementer { get; init; } = 1;
-    public Guid Uid { get; init; }  = Guid.NewGuid();
+    string ActionName { get; }
+    public Guid Uid { get; }
 }

@@ -4,10 +4,9 @@
 /// If you use it, donate something to a charity somewhere
 /// ============================================================
 
-namespace Blazr.Diode.Entities
+namespace Blazr.Diode;
+
+public interface IDiodeEntity 
 {
-    public class IDiodeUid
-    {
-        public Guid Uid { get; }
-    }
+    public Guid Uid { get; }
 }

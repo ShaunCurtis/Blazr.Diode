@@ -1,3 +1,4 @@
+using Blazr.Diode;
 using Blazr.Diode.Server.Web.Counter;
 using Blazr.Diode.Server.Web.Data;
 
@@ -7,7 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
-builder.Services.AddCounterServices();
+builder.Services.AddScoped<DiodeContextProvider<CounterData>>();
+builder.Services.AddTransient<IDiodeHandler<CounterData, CounterIncrementAction>, CounterIncrementHandler>();
 
 var app = builder.Build();
 

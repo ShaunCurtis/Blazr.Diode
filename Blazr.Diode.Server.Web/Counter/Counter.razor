@@ -1,0 +1,77 @@
+﻿@implements IDisposable
+@inject DiodeContextProvider<CounterData> DiodeProvider;
+<PageTitle>Counter</PageTitle>
+
+<div class="bg-light mt-3 p-2 border border-1">
+
+    <h1>Counter</h1>
+
+    <p role="status">Current count:@_context.ImmutableItem.Counter</p>
+
+    <div class="row">
+
+        <div class="col-12 col-sm-6 col-md-4 mb-3">
+            <button class="btn btn-primary" @onclick="IncrementCount">@_buttonText</button>
+        </div>
+
+        <div class="col-12 col-sm-6 col-md-8 mb-3">
+            <input class="form-range" type="range" min="1" max="10" @bind=_range @bind:after="this.RangeChanged" />
+        </div>
+
+    </div>
+
+    <div class="mt-2">Diode Context Uid : @this.DataUid</div>
+</div>
+
+@code {
+    [Parameter] public Guid DataUid { get; set; } = _counterUid;
+
+    private static Guid _counterUid = Guid.NewGuid();
+    private int _range = 1;
+    private CounterIncrementAction _action = new(_counterUid);
+    private CounterSetIncrementerAction _setIncrementAction = new(_counterUid);
+    private DiodeContext<CounterData> _context = default!;
+    private bool _mutating;
+    private string _buttonText => $"Increment by {_context.ImmutableItem.Incrementer}";
+
+
+    protected override void OnInitialized()
+    {
+        var result = this.DiodeProvider.CreateorGetContext(new() { Uid = this.DataUid });
+        _context = result.Item;
+        _range = _context.ImmutableItem.Incrementer;
+        _action = _action with { Uid = this.DataUid };
+        _setIncrementAction = _setIncrementAction with { Uid = this.DataUid, Incrementer = _range };
+        _context.StateHasChanged += CounterStateChanged;
+    }
+
+    private async Task IncrementCount()
+    {
+        _mutating = true;
+        await this.DiodeProvider.DispatchAsync(_action);
+        _mutating = false;
+    }
+
+    private async Task RangeChanged()
+    {
+        _setIncrementAction = _setIncrementAction with { Incrementer = _range };
+
+        _mutating = true;
+        await this.DiodeProvider.DispatchAsync(_setIncrementAction);
+        _mutating = false;
+    }
+
+    public void CounterStateChanged(object? sender, DiodeContextChangeEventArgs<CounterData> e)
+    {
+        if (_mutating)
+            return;
+
+        _range = _context.ImmutableItem.Incrementer;
+        this.StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        _context.StateHasChanged -= CounterStateChanged;
+    }
+}

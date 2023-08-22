@@ -1,8 +1,18 @@
-﻿namespace Blazr.Diode.Server.Web.Counter;
+﻿/// ============================================================
+/// Author: Shaun Curtis, Cold Elm Coders
+/// License: Use And Donate
+/// If you use it, donate something to a charity somewhere
+/// ============================================================
+
+namespace Blazr.Diode.Server.Web.Counter;
 
 public record CounterIncrementAction : IDiodeAction
 {
-    public string Name => $"Increment by {this.IncrementBy}";
+    public Guid Uid { get; init; }
+    public string ActionName => $"Increment Counter";
 
-    public int IncrementBy { get; init; } = 1;    
+    public CounterIncrementAction(Guid uid)
+    {
+        Uid = uid;
+    }
 }

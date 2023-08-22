@@ -8,11 +8,15 @@ namespace Blazr.Diode;
 
 public class DiodeStateChangeEventArgs : EventArgs
 {
+    public Guid Uid { get; init; }
+
     public object? MutatedItem { get; init; }
 
-    public DiodeStateChangeEventArgs(object? mutatedItem)
-        => this.MutatedItem = mutatedItem;
-
-    public static DiodeStateChangeEventArgs Create(object? mutatedItem)
-        => new(mutatedItem);
+    public DiodeStateChangeEventArgs(Guid uid, object? mutatedItem)
+    { 
+        this.MutatedItem = mutatedItem;
+        Uid = uid;
+    }
+    public static DiodeStateChangeEventArgs Create(Guid uid, object? mutatedItem)
+        => new(uid, mutatedItem);
 }
