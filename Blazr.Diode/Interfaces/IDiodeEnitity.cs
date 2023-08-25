@@ -9,5 +9,4 @@ namespace Blazr.Diode;
 public interface IDiodeEntity 
 {
     public Guid Uid { get; }
-    public record DiodeUid(Guid Uid);
 }
