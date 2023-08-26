@@ -3,7 +3,7 @@
 /// License: Use And Donate
 /// If you use it, donate something to a charity somewhere
 /// ============================================================
-using Blazr.Diode.Aggregates;
+using Blazr.Diode.Composites;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 

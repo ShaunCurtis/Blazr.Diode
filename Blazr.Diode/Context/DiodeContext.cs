@@ -3,8 +3,6 @@
 /// License: Use And Donate
 /// If you use it, donate something to a charity somewhere
 /// ============================================================
-using Blazr.Diode.Aggregates;
-
 namespace Blazr.Diode;
 
 /// <summary>

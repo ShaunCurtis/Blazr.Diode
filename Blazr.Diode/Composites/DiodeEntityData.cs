@@ -4,7 +4,7 @@
 /// If you use it, donate something to a charity somewhere
 /// ============================================================
 
-namespace Blazr.Diode.Aggregates;
+namespace Blazr.Diode.Composites;
 
 /// <summary>
 /// A record that represents the data within a Diode context
