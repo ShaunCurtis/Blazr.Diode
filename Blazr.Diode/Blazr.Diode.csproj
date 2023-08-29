@@ -4,14 +4,34 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>Blazr Diode State Manangement Framework</Title>
+    <Authors>Shaun Curtis</Authors>
+    <Company>Cold Elm Coders</Company>
+    <Description>A State Management System based on the Flux pattern</Description>
+    <Copyright>Use and Donate</Copyright>
+    <PackageReadmeFile>Package.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/ShaunCurtis/Blazr.Diode</RepositoryUrl>
+    <PackageReleaseNotes>Pre Realease Test Version</PackageReleaseNotes>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <FileVersion>0.1.0.0</FileVersion>
+    <PackageLicenseFile>license.txt</PackageLicenseFile>
   </PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Components.Forms" Version="7.0.8" />
+		<PackageReference Include="Blazr.Core" Version="1.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Forms" Version="7.0.10" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\Blazr.Core\Blazr.Core\Blazr.Core.csproj" />
+	  <None Update="license.txt">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	  <None Update="Package.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
 	</ItemGroup>
 
 </Project>
