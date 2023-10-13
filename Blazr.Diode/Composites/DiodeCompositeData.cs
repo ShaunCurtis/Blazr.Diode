@@ -13,7 +13,7 @@ namespace Blazr.Diode.Composites;
 /// </summary>
 /// <typeparam name="TRootItem"></typeparam>
 /// <typeparam name="TCollectionItem"></typeparam>
-public record DiodeCompositeData<TRootItem, TCollectionItem> : IDiodeEntity, IEntity
+public record DiodeCompositeData<TRootItem, TCollectionItem> : IDiodeEntity
     where TRootItem : class, IDiodeEntity, new()
     where TCollectionItem : class, IDiodeEntity, new()
 {

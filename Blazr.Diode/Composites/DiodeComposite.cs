@@ -8,9 +8,9 @@ using Blazr.Core;
 
 namespace Blazr.Diode.Composites;
 
-public abstract class DiodeComposite<TRootItem, TCollectionItem> : IDiodeEntity, IEntity
-    where TRootItem : class, IDiodeEntity, IEntity, new()
-    where TCollectionItem : class, IDiodeEntity, IEntity, new()
+public abstract class DiodeComposite<TRootItem, TCollectionItem> : IDiodeEntity
+    where TRootItem : class, IDiodeEntity, new()
+    where TCollectionItem : class, IDiodeEntity, new()
 {
     private readonly IServiceProvider _serviceProvider;
     private bool _loaded;

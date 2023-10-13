@@ -10,8 +10,8 @@ using System.Diagnostics.CodeAnalysis;
 namespace Blazr.Diode.Composites;
 
 public class DiodeCompositeProvider<TRootItem, TCollectionItem> : IEnumerable<DiodeComposite<TRootItem, TCollectionItem>>
-    where TRootItem : class, IDiodeEntity, IEntity, new()
-    where TCollectionItem : class, IDiodeEntity, IEntity, new()
+    where TRootItem : class, IDiodeEntity, new()
+    where TCollectionItem : class, IDiodeEntity, new()
 {
     private readonly IServiceProvider _serviceProvider;
 
