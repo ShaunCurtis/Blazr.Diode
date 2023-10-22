@@ -8,10 +8,10 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Blazr.Diode;
 
-public record DiodeContextEntry<T, K>(K Key, DiodeContext<T> Context)
+public record DiodeContextEntry<K, T>(K Key, DiodeContext<T> Context)
     where T : class, IDiodeEntity, new();
 
-public class DiodeContextProvider<T, K>
+public class DiodeContextProvider<K, T>
     where T : class, IDiodeEntity, new()
 {
     private readonly IServiceProvider _serviceProvider;
@@ -21,12 +21,12 @@ public class DiodeContextProvider<T, K>
         _serviceProvider = serviceProvider;
     }
 
-    private List<DiodeContextEntry<T, K>> _contexts { get; set; } = new List<DiodeContextEntry<T, K>>();
+    private List<DiodeContextEntry<K, T>> _contexts { get; set; } = new List<DiodeContextEntry<K, T>>();
 
     /// <summary>
     /// Readonly list of Registered Contexts
     /// </summary>
-    public IEnumerable<DiodeContextEntry<T, K>> Contexts => _contexts.AsEnumerable();
+    public IEnumerable<DiodeContextEntry<K, T>> Contexts => _contexts.AsEnumerable();
 
     public event EventHandler<DiodeContextChangeEventArgs<T>>? StateHasChanged;
 
@@ -92,8 +92,8 @@ public class DiodeContextProvider<T, K>
 
         var newContext = new DiodeContext<T>(item, state ?? DiodeState.New());
 
-        this._contexts.Add(new(key,newContext));
-        this.OnStateChange(newContext);
+        this._contexts.Add(new(key, newContext));
+        this.OnStateChange(key, newContext);
 
         return DiodeProviderResult<DiodeContext<T>>.Create(newContext);
     }
@@ -112,7 +112,7 @@ public class DiodeContextProvider<T, K>
         var newContext = new DiodeContext<T>(item, state ?? DiodeState.New());
 
         this._contexts.Add(new(key, newContext));
-        this.OnStateChange(newContext);
+        this.OnStateChange(key, newContext);
 
         return DiodeResult<DiodeContext<T>>.Success(newContext);
     }
@@ -132,8 +132,8 @@ public class DiodeContextProvider<T, K>
         if (context is null)
             return DataResult.Failure($"No Store exists = {key?.ToString()}");
 
-        this._contexts.Remove(new(key,context));
-        this.OnStateChange(context);
+        this._contexts.Remove(new(key, context));
+        this.OnStateChange(key, context);
 
         return DataResult.Success();
     }
@@ -147,11 +147,11 @@ public class DiodeContextProvider<T, K>
     public async ValueTask<DiodeResult<T>> DispatchAsync<TAction>(TAction action)
     where TAction : class, IDiodeAction<K>
     {
-        var context = this.GetContext(action.Uid);
+        var context = this.GetContext(action.KeyValue);
 
         // deal with a null store
         if (context is null)
-            return DiodeResult<T>.Failure($"Could not locate a registered context for {typeof(T).Name} and ID : {action.Uid}");
+            return DiodeResult<T>.Failure($"Could not locate a registered context for {typeof(T).Name} and Key : {action.KeyValue?.ToString()}");
 
         MutationResult<T> result;
 
@@ -162,14 +162,14 @@ public class DiodeContextProvider<T, K>
             result = await context.QueueAsync(mutationAction.Mutation);
 
             if (result.IsMutated)
-                this.OnStateChange(result.Item.Uid, context);
+                this.OnStateChange(action.KeyValue, context);
 
             return DiodeResult<T>.Success(result.Item);
         }
 
         // We have an action that requires a handler
         // Gets the DI registered action from the DI Provider
-        var handler = _serviceProvider.GetService<IDiodeHandler<T, TAction>>();
+        var handler = _serviceProvider.GetService<IDiodeHandler<K, T, TAction>>();
 
         // deal with a null Handler
         if (handler is null)
@@ -181,7 +181,7 @@ public class DiodeContextProvider<T, K>
         result = await context.QueueAsync(handler.Mutation);
 
         if (result.IsMutated)
-            this.OnStateChange(result.Item.Uid, context);
+            this.OnStateChange(handler.Action.KeyValue, context);
 
         return DiodeResult<T>.Success(result.Item);
     }
@@ -192,18 +192,18 @@ public class DiodeContextProvider<T, K>
     /// <param name="mutationDelegate"></param>
     /// <param name="uid"></param>
     /// <returns></returns>
-    public async ValueTask<DiodeResult<T>> DispatchDelegateAsync(DiodeAsyncMutationDelegate<T> mutationDelegate, Guid uid)
+    public async ValueTask<DiodeResult<T>> DispatchDelegateAsync(DiodeAsyncMutationDelegate<T> mutationDelegate, K key)
     {
-        var context = this.GetContext(uid);
+        var context = this.GetContext(key);
 
         // deal with a null store
         if (context is null)
-            return DiodeResult<T>.Failure($"Could not locate a registered context for {typeof(T).Name} and ID : {uid}");
+            return DiodeResult<T>.Failure($"Could not locate a registered context for {typeof(T).Name} and Key : {key?.ToString()}");
 
         var result = await context.QueueAsync(mutationDelegate);
 
         if (result.IsMutated)
-            this.OnStateChange(result.Item.Uid, context);
+            this.OnStateChange(key, context);
 
         return DiodeResult<T>.Success(result.Item);
     }
@@ -212,16 +212,16 @@ public class DiodeContextProvider<T, K>
     /// Resets the state on the context
     /// </summary>
     /// <param name="uid"></param>
-    public DataResult MarkContextAsPersisted(Guid uid)
+    public DataResult MarkContextAsPersisted(K key)
     {
-        if (this.TryGetContext(uid, out DiodeContext<T>? context))
+        if (this.TryGetContext(key, out DiodeContext<T>? context))
         {
             context.MarkAsPersisted();
-            this.OnStateChange(uid, context);
+            this.OnStateChange(key, context);
             return DataResult.Success();
         }
 
-        return DataResult.Failure($"No Context exists for ID: {uid}");
+        return DataResult.Failure($"No Context exists for Key:  {key?.ToString()}");
     }
 
     /// <summary>
@@ -229,16 +229,16 @@ public class DiodeContextProvider<T, K>
     /// T record will be deleted from the data store when the context is next persisted
     /// </summary>
     /// <param name="uid"></param>
-    public DataResult MarkContextForDeletion(Guid uid)
+    public DataResult MarkContextForDeletion(K key)
     {
-        if (this.TryGetContext(uid, out DiodeContext<T>? context))
+        if (this.TryGetContext(key, out DiodeContext<T>? context))
         {
             context.MarkForDeletion();
-            this.OnStateChange(context);
+            this.OnStateChange(key, context);
             return DataResult.Success();
         }
 
-        return DataResult.Failure($"No Context exists for ID: {uid}");
+        return DataResult.Failure($"No Context exists for Key: {key?.ToString()}");
     }
 
     /// <summary>
@@ -247,6 +247,6 @@ public class DiodeContextProvider<T, K>
     /// </summary>
     /// <param name="uid"></param>
     /// <param name="sender"></param>
-    public void OnStateChange(DiodeContext<T> sender)
-        => this.StateHasChanged?.Invoke(this, new DiodeContextChangeEventArgs<T>(sender));
+    public void OnStateChange(object? key, DiodeContext<T> sender)
+        => this.StateHasChanged?.Invoke(this, new DiodeContextChangeEventArgs<T>(key, sender));
 }

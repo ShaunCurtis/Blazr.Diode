@@ -1,5 +1,5 @@
 ﻿@implements IDisposable
-@inject DiodeContextProvider<CounterData> DiodeProvider;
+@inject DiodeContextProvider<Guid,CounterData> DiodeProvider;
 <PageTitle>Counter</PageTitle>
 
 <div class="bg-light mt-3 p-2 border border-1">
@@ -37,11 +37,11 @@
 
     protected override void OnInitialized()
     {
-        var result = this.DiodeProvider.CreateorGetContext(new() { Uid = this.DataUid });
+        var result = this.DiodeProvider.CreateorGetContext(this.DataUid, new() { Uid = this.DataUid });
         _context = result.Item;
         _range = _context.ImmutableItem.Incrementer;
-        _action = _action with { Uid = this.DataUid };
-        _setIncrementAction = _setIncrementAction with { Uid = this.DataUid, Incrementer = _range };
+        _action = _action with { KeyValue = this.DataUid };
+        _setIncrementAction = _setIncrementAction with { KeyValue = this.DataUid, Incrementer = _range };
         _context.StateHasChanged += CounterStateChanged;
     }
 

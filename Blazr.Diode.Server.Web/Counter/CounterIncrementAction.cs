@@ -6,13 +6,13 @@
 
 namespace Blazr.Diode.Server.Web.Counter;
 
-public record CounterIncrementAction : IDiodeAction
+public record CounterIncrementAction : IDiodeAction<Guid>
 {
-    public Guid Uid { get; init; }
+    public Guid KeyValue { get; init; }
     public string ActionName => $"Increment Counter";
 
     public CounterIncrementAction(Guid uid)
     {
-        Uid = uid;
+        this.KeyValue = uid;
     }
 }

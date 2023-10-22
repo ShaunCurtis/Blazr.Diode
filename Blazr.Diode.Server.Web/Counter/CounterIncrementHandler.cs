@@ -6,7 +6,7 @@
 
 namespace Blazr.Diode.Server.Web.Counter;
 
-public class CounterIncrementHandler : IDiodeHandler<CounterData, CounterIncrementAction>
+public class CounterIncrementHandler : IDiodeHandler<Guid, CounterData, CounterIncrementAction>
 {
     public CounterIncrementAction? Action { get; set; } = default;
 

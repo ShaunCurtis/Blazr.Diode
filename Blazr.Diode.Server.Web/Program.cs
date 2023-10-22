@@ -8,8 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
-builder.Services.AddScoped<DiodeContextProvider<CounterData>>();
-builder.Services.AddTransient<IDiodeHandler<CounterData, CounterIncrementAction>, CounterIncrementHandler>();
+builder.Services.AddScoped<DiodeContextProvider<Guid, CounterData>>();
+builder.Services.AddTransient<IDiodeHandler<Guid, CounterData, CounterIncrementAction>, CounterIncrementHandler>();
 
 var app = builder.Build();
 

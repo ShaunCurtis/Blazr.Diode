@@ -6,16 +6,16 @@
 
 namespace Blazr.Diode.Server.Web.Counter;
 
-public record CounterSetIncrementerAction : IDiodeAction, IDiodeMutation<CounterData>
+public record CounterSetIncrementerAction : IDiodeAction<Guid>, IDiodeMutation<CounterData>
 {
-    public Guid Uid { get; init; }
+    public Guid KeyValue { get; init; }
     public string ActionName => $"Set Incrementer";
 
     public int Incrementer { get; init; } = 1;
 
     public CounterSetIncrementerAction(Guid uid)
     {
-        Uid = uid;
+        this.KeyValue = uid;
     }
 
     public DiodeAsyncMutationDelegate<CounterData> Mutation => (DiodeMutationRequest<CounterData> request) =>

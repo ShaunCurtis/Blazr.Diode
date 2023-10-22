@@ -128,6 +128,6 @@ public class DiodeContext<T>
 
     internal void NotifyStateHasChanged()
     {
-        this.StateHasChanged?.Invoke(this, new DiodeContextChangeEventArgs<T>(this));
+        this.StateHasChanged?.Invoke(this, new DiodeContextChangeEventArgs<T>(null, this));
     }
 }
