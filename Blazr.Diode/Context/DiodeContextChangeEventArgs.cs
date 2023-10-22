@@ -13,11 +13,10 @@ public class DiodeContextChangeEventArgs<T> : EventArgs
 
     public DiodeContext<T> MutatedItem { get; init; }
 
-    public DiodeContextChangeEventArgs(Guid uid, DiodeContext<T> mutatedItem)
+    public DiodeContextChangeEventArgs(DiodeContext<T> mutatedItem)
     { 
         this.MutatedItem = mutatedItem;
-        Uid = uid;
     }
-    public static DiodeContextChangeEventArgs<T> Create(Guid uid, DiodeContext<T> mutatedItem)
-        => new(uid, mutatedItem);
+    public static DiodeContextChangeEventArgs<T> Create(DiodeContext<T> mutatedItem)
+        => new(mutatedItem);
 }

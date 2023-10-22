@@ -18,8 +18,6 @@ public class DiodeContext<T>
     private readonly Queue<DiodeAsyncMutationDelegate<T>> _mutationQueue = new();
     private T _immutableItem;
 
-    public Guid Uid => ImmutableItem.Uid;
-
     public DiodeState State { get; private set; }
 
     /// <summary>
@@ -130,6 +128,6 @@ public class DiodeContext<T>
 
     internal void NotifyStateHasChanged()
     {
-        this.StateHasChanged?.Invoke(this, new DiodeContextChangeEventArgs<T>(this.Uid, this));
+        this.StateHasChanged?.Invoke(this, new DiodeContextChangeEventArgs<T>(this));
     }
 }

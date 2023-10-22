@@ -7,10 +7,10 @@
 namespace Blazr.Diode;
 
 /// <summary>
-/// Interface defining a Mustation Request
+/// Interface defining a Mutation Request
 /// </summary>
-public interface IDiodeAction
+public interface IDiodeAction<K>
 {
     string ActionName { get; }
-    public Guid Uid { get; }
+    public K KeyValue { get; }
 }

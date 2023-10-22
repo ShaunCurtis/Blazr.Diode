@@ -19,6 +19,12 @@
     <PackageLicenseFile>license.txt</PackageLicenseFile>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Composites\**" />
+    <EmbeddedResource Remove="Composites\**" />
+    <None Remove="Composites\**" />
+  </ItemGroup>
+
 	<ItemGroup>
 		<PackageReference Include="Blazr.Core" Version="1.0.2" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.Forms" Version="7.0.12" />

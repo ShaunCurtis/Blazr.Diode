@@ -8,7 +8,10 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Blazr.Diode;
 
-public class DiodeContextProvider<T> : IEnumerable<DiodeContext<T>>
+public record DiodeContextEntry<T, K>(K Key, DiodeContext<T> Context)
+    where T : class, IDiodeEntity, new();
+
+public class DiodeContextProvider<T, K>
     where T : class, IDiodeEntity, new()
 {
     private readonly IServiceProvider _serviceProvider;
@@ -18,12 +21,12 @@ public class DiodeContextProvider<T> : IEnumerable<DiodeContext<T>>
         _serviceProvider = serviceProvider;
     }
 
-    private List<DiodeContext<T>> _contexts { get; set; } = new List<DiodeContext<T>>();
+    private List<DiodeContextEntry<T, K>> _contexts { get; set; } = new List<DiodeContextEntry<T, K>>();
 
     /// <summary>
     /// Readonly list of Registered Contexts
     /// </summary>
-    public IEnumerable<DiodeContext<T>> Contexts => _contexts.AsEnumerable();
+    public IEnumerable<DiodeContextEntry<T, K>> Contexts => _contexts.AsEnumerable();
 
     public event EventHandler<DiodeContextChangeEventArgs<T>>? StateHasChanged;
 
@@ -33,7 +36,7 @@ public class DiodeContextProvider<T> : IEnumerable<DiodeContext<T>>
         {
             List<DiodeEntityData<T>> list = new();
             foreach (var item in _contexts)
-                list.Add(item.AsDiodeEntityData);
+                list.Add(item.Context.AsDiodeEntityData);
 
             return list;
         }
@@ -45,8 +48,13 @@ public class DiodeContextProvider<T> : IEnumerable<DiodeContext<T>>
     /// </summary>
     /// <param name="uid"></param>
     /// <returns></returns>
-    public DiodeContext<T>? GetContext(Guid uid)
-        => this._contexts.FirstOrDefault(s => s.Uid == uid);
+    public DiodeContext<T>? GetContext(K key)
+    {
+        if (key == null)
+            return null;
+
+        return this._contexts.FirstOrDefault(s => key.Equals(s.Key))?.Context;
+    }
 
     /// <summary>
     /// Tries to get the registered context
@@ -54,9 +62,14 @@ public class DiodeContextProvider<T> : IEnumerable<DiodeContext<T>>
     /// <param name="uid"></param>
     /// <param name="context"></param>
     /// <returns></returns>
-    public bool TryGetContext(Guid uid, [NotNullWhen(true)] out DiodeContext<T>? context)
+    public bool TryGetContext(K key, [NotNullWhen(true)] out DiodeContext<T>? context)
     {
-        context = this._contexts.FirstOrDefault(s => s.Uid == uid);
+        context = null;
+        if (key == null)
+            return false;
+
+        context = this._contexts.FirstOrDefault(s => key.Equals(s.Key))?.Context;
+
         return context is not null;
     }
 
@@ -67,32 +80,39 @@ public class DiodeContextProvider<T> : IEnumerable<DiodeContext<T>>
     /// <param name="item"></param>
     /// <param name="state"></param>
     /// <returns></returns>
-    public DiodeProviderResult<DiodeContext<T>> CreateorGetContext(T item, DiodeState? state = null)
+    public DiodeProviderResult<DiodeContext<T>> CreateorGetContext(K key, T item, DiodeState? state = null)
     {
-        var context = this._contexts.FirstOrDefault(s => s.Uid == item.Uid);
+        DiodeContext<T>? context = null;
+
+        if (key != null)
+            context = this._contexts.FirstOrDefault(s => key.Equals(s.Key))?.Context;
 
         if (context is not null)
             return DiodeProviderResult<DiodeContext<T>>.AlreadyExists(context);
 
         var newContext = new DiodeContext<T>(item, state ?? DiodeState.New());
 
-        this._contexts.Add(newContext);
-        this.OnStateChange(newContext.Uid, newContext);
+        this._contexts.Add(new(key,newContext));
+        this.OnStateChange(newContext);
 
         return DiodeProviderResult<DiodeContext<T>>.Create(newContext);
     }
 
-    public DiodeResult<DiodeContext<T>> CreateContext(T item, DiodeState? state = null)
+    public DiodeResult<DiodeContext<T>> CreateContext(K key, T item, DiodeState? state = null)
     {
-        var context = this._contexts.FirstOrDefault(s => s.Uid == item.Uid);
+
+        DiodeContext<T>? context = null;
+
+        if (key != null)
+            context = this._contexts.FirstOrDefault(s => key.Equals(s.Key))?.Context;
 
         if (context is not null)
             return DiodeResult<DiodeContext<T>>.Failure($"A context already exists for {item.Uid}");
 
         var newContext = new DiodeContext<T>(item, state ?? DiodeState.New());
 
-        this._contexts.Add(newContext);
-        this.OnStateChange(newContext.Uid, newContext);
+        this._contexts.Add(new(key, newContext));
+        this.OnStateChange(newContext);
 
         return DiodeResult<DiodeContext<T>>.Success(newContext);
     }
@@ -102,15 +122,18 @@ public class DiodeContextProvider<T> : IEnumerable<DiodeContext<T>>
     /// </summary>
     /// <param name="uid"></param>
     /// <returns></returns>
-    public DataResult ClearContext(Guid uid)
+    public DataResult ClearContext(K key)
     {
-        var context = this._contexts.FirstOrDefault(s => s.Uid == uid);
+        DiodeContext<T>? context = null;
+
+        if (key != null)
+            context = this._contexts.FirstOrDefault(s => key.Equals(s.Key))?.Context;
 
         if (context is null)
-            return DataResult.Failure($"No Store exists = {uid}");
+            return DataResult.Failure($"No Store exists = {key?.ToString()}");
 
-        this._contexts.Remove(context);
-        this.OnStateChange(uid, context);
+        this._contexts.Remove(new(key,context));
+        this.OnStateChange(context);
 
         return DataResult.Success();
     }
@@ -122,7 +145,7 @@ public class DiodeContextProvider<T> : IEnumerable<DiodeContext<T>>
     /// <param name="action"></param>
     /// <returns></returns>
     public async ValueTask<DiodeResult<T>> DispatchAsync<TAction>(TAction action)
-    where TAction : class, IDiodeAction
+    where TAction : class, IDiodeAction<K>
     {
         var context = this.GetContext(action.Uid);
 
@@ -211,7 +234,7 @@ public class DiodeContextProvider<T> : IEnumerable<DiodeContext<T>>
         if (this.TryGetContext(uid, out DiodeContext<T>? context))
         {
             context.MarkForDeletion();
-            this.OnStateChange(uid, context);
+            this.OnStateChange(context);
             return DataResult.Success();
         }
 
@@ -224,16 +247,6 @@ public class DiodeContextProvider<T> : IEnumerable<DiodeContext<T>>
     /// </summary>
     /// <param name="uid"></param>
     /// <param name="sender"></param>
-    public void OnStateChange(Guid uid, DiodeContext<T> sender)
-        => this.StateHasChanged?.Invoke(this, new DiodeContextChangeEventArgs<T>(uid, sender));
-
-    /// <summary>
-    /// Public enumerator for the collection
-    /// </summary>
-    /// <returns></returns>
-    public IEnumerator<DiodeContext<T>> GetEnumerator()
-        => _contexts.GetEnumerator();
-
-    IEnumerator IEnumerable.GetEnumerator()
-        => this.GetEnumerator();
+    public void OnStateChange(DiodeContext<T> sender)
+        => this.StateHasChanged?.Invoke(this, new DiodeContextChangeEventArgs<T>(sender));
 }
