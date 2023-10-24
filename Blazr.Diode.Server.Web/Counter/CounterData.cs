@@ -6,9 +6,8 @@
 
 namespace Blazr.Diode.Server.Web.Counter;
 
-public record CounterData : IDiodeEntity
+public record CounterData 
 {
     public int Counter { get; init; }
     public int Incrementer { get; init; } = 1;
-    public Guid Uid { get; init; }  = Guid.NewGuid();
 }

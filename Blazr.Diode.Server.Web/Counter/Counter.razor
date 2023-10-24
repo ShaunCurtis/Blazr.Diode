@@ -37,7 +37,7 @@
 
     protected override void OnInitialized()
     {
-        var result = this.DiodeProvider.CreateorGetContext(this.DataUid, new() { Uid = this.DataUid });
+        var result = this.DiodeProvider.CreateorGetContext(this.DataUid, new());
         _context = result.Item;
         _range = _context.ImmutableItem.Incrementer;
         _action = _action with { KeyValue = this.DataUid };

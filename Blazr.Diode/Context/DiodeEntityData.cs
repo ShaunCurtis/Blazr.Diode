@@ -14,4 +14,4 @@ namespace Blazr.Diode;
 /// <param name="Data"></param>
 /// <param name="State"></param>
 public record DiodeEntityData<T>(T Data, DiodeState State)
-    where T : class, IDiodeEntity, new();
+    where T : class, new();

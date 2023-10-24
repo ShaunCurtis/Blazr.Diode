@@ -7,7 +7,7 @@
 namespace Blazr.Diode;
 
 public class DiodeContextChangeEventArgs<T> : EventArgs
-    where T : class, IDiodeEntity, new()
+    where T : class, new()
 {
     public object? KeyValue { get; init; }
 

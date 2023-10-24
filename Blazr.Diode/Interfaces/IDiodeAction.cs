@@ -14,3 +14,8 @@ public interface IDiodeAction<K>
     string ActionName { get; }
     public K KeyValue { get; }
 }
+
+public interface IDiodeAction
+{
+    string ActionName { get; }
+}

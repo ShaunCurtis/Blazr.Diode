@@ -11,7 +11,7 @@ namespace Blazr.Diode;
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public class DiodeContext<T>
-    where T : class, IDiodeEntity, new()
+    where T : class, new()
 {
     private Task _task = Task.CompletedTask;
     private TaskCompletionSource<MutationResult<T>> _queueLoopTaskSource = new();

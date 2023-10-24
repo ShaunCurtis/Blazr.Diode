@@ -6,17 +6,14 @@
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Blazr.Diode;
+namespace Blazr.Diode.Composites;
 
-public record DiodeContextEntry<K, T>(K Key, DiodeContext<T> Context)
-    where T : class, new();
-
-public class DiodeContextProvider<K, T>
+public class DiodeCollectionCompositeProvider<K, T>
     where T : class, new()
 {
     private readonly IServiceProvider _serviceProvider;
 
-    public DiodeContextProvider(IServiceProvider serviceProvider)
+    public DiodeCollectionCompositeProvider(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
     }
@@ -117,12 +114,7 @@ public class DiodeContextProvider<K, T>
         return DiodeResult<DiodeContext<T>>.Success(newContext);
     }
 
-    /// <summary>
-    /// Clears the provided context from the context list
-    /// </summary>
-    /// <param name="uid"></param>
-    /// <returns></returns>
-    public DataResult ClearContext(K key)
+    private DataResult ClearContext(K key)
     {
         DiodeContext<T>? context = null;
 

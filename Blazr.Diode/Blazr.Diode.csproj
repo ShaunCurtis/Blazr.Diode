@@ -20,9 +20,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Composites\**" />
-    <EmbeddedResource Remove="Composites\**" />
-    <None Remove="Composites\**" />
+    <Compile Remove="Composites\DiodeComposite.cs" />
+    <Compile Remove="Composites\DiodeCompositeData.cs" />
+    <Compile Remove="Composites\DiodeCompositeProvider.cs" />
   </ItemGroup>
 
 	<ItemGroup>

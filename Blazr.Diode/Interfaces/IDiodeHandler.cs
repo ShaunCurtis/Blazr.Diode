@@ -13,3 +13,11 @@ public interface IDiodeHandler<K, T, TAction>
     public TAction? Action { get; set; }
     public DiodeAsyncMutationDelegate<T> Mutation { get; }
 }
+
+public interface IDiodeHandler<T, TAction>
+    where T : class
+    where TAction : class, IDiodeAction
+{
+    public TAction? Action { get; set; }
+    public DiodeAsyncMutationDelegate<T> Mutation { get; }
+}
