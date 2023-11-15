@@ -16,7 +16,8 @@ public class DiodeSingletonCompositeProvider<T>
         _serviceProvider = serviceProvider;
     }
 
-    public DiodeContext<T>? Context => _context;
+    // TODO - Change to more exclusive Exception
+    public DiodeContext<T> Context => _context ?? throw new Exception("Trying to access the Diode Context before it is configured.");
 
     public event EventHandler<DiodeContextChangeEventArgs<T>>? StateHasChanged;
 
@@ -44,9 +45,8 @@ public class DiodeSingletonCompositeProvider<T>
     /// <param name="action"></param>
     /// <returns></returns>
     public async ValueTask<DiodeResult<T>> DispatchAsync<TAction>(TAction action)
-    where TAction : class, IDiodeAction
+        where TAction : class, IDiodeAction
     {
-
         // deal with a null store
         if (_context is null)
             return DiodeResult<T>.Failure($"Could not locate a registered context for {typeof(T).Name}.");

@@ -75,7 +75,7 @@ public class DiodeContext<T>
 
     private async Task StartQueueLoopAsync()
     {
-        bool isMutation;
+        bool isMutation = false;
 
         // local copy to hold the mutation
         var mutation = _immutableItem;
@@ -90,20 +90,34 @@ public class DiodeContext<T>
             var result = await action.Invoke(new(mutation));
 
             // Apply the mutation if successful
-            if (result.Successful && result.Item is not null)
+            if (result.Successful)
             {
                 mutation = result.Item;
             }
         }
 
-        // check if we have actually mutated
-        isMutation = _immutableItem != mutation;
-
-        // If we have actually mutated the object set the value and state
-        if (isMutation)
+        // If the mutation is null then we need to mark it for deletion
+        if (mutation is null && !this.State.IsMarkedForDeletion)
         {
-            _immutableItem = mutation;
-            this.State = this.State.Mutated;
+            this.State = this.State.MarkForDeletion;
+            isMutation = true;
+        }
+
+        if (mutation is not null)
+        {
+            // check if we have actually mutated
+            isMutation = _immutableItem != mutation;
+
+            // If we have actually mutated the object set the value and state
+            if (isMutation)
+            {
+                _immutableItem = mutation;
+
+                // If it's new then it can't be mutated as it doesn't anywhere except here
+                // and the persistence layer needs to know it's a new object
+                if (!this.State.IsNew)
+                    this.State = this.State.Mutated;
+            }
         }
 
         // complete the task tracking the process

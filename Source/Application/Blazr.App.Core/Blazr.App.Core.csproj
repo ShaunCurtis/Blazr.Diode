@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Blazr.Core" Version="1.0.2" />
+		<PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+		<PackageReference Include="Blazr.OneWayStreet" Version="1.2.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Books\CQS\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\..\Blazr.Diode\Blazr.Diode.csproj" />
+	</ItemGroup>
+
+</Project>

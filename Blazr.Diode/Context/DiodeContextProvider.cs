@@ -80,7 +80,7 @@ public class DiodeContextProvider<K, T>
     /// <param name="item"></param>
     /// <param name="state"></param>
     /// <returns></returns>
-    public DiodeProviderResult<DiodeContext<T>> CreateorGetContext(K key, T item, DiodeState? state = null)
+    public DiodeProviderResult<DiodeContext<T>> CreateOrGetContext(K key, T item, DiodeState? state = null)
     {
         DiodeContext<T>? context = null;
 

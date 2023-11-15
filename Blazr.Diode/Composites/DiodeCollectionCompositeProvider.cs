@@ -39,6 +39,18 @@ public class DiodeCollectionCompositeProvider<K, T>
         }
     }
 
+    public IEnumerable<T> AsList
+    {
+        get
+        {
+            List<T> list = new();
+            foreach (var item in _contexts)
+                list.Add(item.Context.ImmutableItem);
+
+            return list;
+        }
+    }
+
     /// <summary>
     /// Gets the registered context
     /// Will return a null if one doesn't exist
@@ -77,7 +89,7 @@ public class DiodeCollectionCompositeProvider<K, T>
     /// <param name="item"></param>
     /// <param name="state"></param>
     /// <returns></returns>
-    public DiodeProviderResult<DiodeContext<T>> CreateorGetContext(K key, T item, DiodeState? state = null)
+    public DiodeProviderResult<DiodeContext<T>> CreateOrGetContext(K key, T item, DiodeState? state = null)
     {
         DiodeContext<T>? context = null;
 
@@ -141,7 +153,14 @@ public class DiodeCollectionCompositeProvider<K, T>
     {
         var context = this.GetContext(action.KeyValue);
 
-        // deal with a null store
+        // If the store is null then we need to create a new one
+        if (context is null)
+        {
+            this.CreateContext(action.KeyValue, new T(), DiodeState.New());
+            context = this.GetContext(action.KeyValue);
+        }
+
+        // If the store is still null we have a problem
         if (context is null)
             return DiodeResult<T>.Failure($"Could not locate a registered context for {typeof(T).Name} and Key : {action.KeyValue?.ToString()}");
 
@@ -188,9 +207,16 @@ public class DiodeCollectionCompositeProvider<K, T>
     {
         var context = this.GetContext(key);
 
-        // deal with a null store
+        // If the store is null then we need to create a new one
         if (context is null)
-            return DiodeResult<T>.Failure($"Could not locate a registered context for {typeof(T).Name} and Key : {key?.ToString()}");
+        {
+            this.CreateContext(key, new T(), DiodeState.New());
+            context = this.GetContext(key);
+        }
+
+        // If the store is still null then we have a problem.
+        if (context is null)
+            return DiodeResult<T>.Failure($"No context exists for {typeof(T).Name} and Key : {key?.ToString()}");
 
         var result = await context.QueueAsync(mutationDelegate);
 

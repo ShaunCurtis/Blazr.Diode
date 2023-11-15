@@ -4,9 +4,16 @@
 /// If you use it, donate something to a charity somewhere
 /// ============================================================
 
-namespace Blazr.Diode;
+namespace Blazr.Diode.Core;
 
-public interface IDiodeEntity 
+public readonly record struct ItemRequest(object KeyValue);
+
+public readonly record struct CommandRequest<T>(T item, CommandRequestType type);
+
+public enum CommandRequestType
 {
-    public Guid Uid { get; }
+    None,
+    Create,
+    Update,
+    Delete,
 }
