@@ -6,6 +6,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Books\**" />
+    <EmbeddedResource Remove="Books\**" />
+    <None Remove="Books\**" />
+  </ItemGroup>
+
 	<ItemGroup>
 		<PackageReference Include="Blazr.Core" Version="1.0.2" />
 		<PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
@@ -13,11 +19,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Books\CQS\" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <ProjectReference Include="..\..\..\Blazr.Diode\Blazr.Diode.csproj" />
+	  <ProjectReference Include="..\..\Libraries\Blazr.Diode\Blazr.Diode.csproj" />
 	</ItemGroup>
 
 </Project>
