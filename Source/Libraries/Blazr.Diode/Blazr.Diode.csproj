@@ -1,44 +1,38 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Title>Blazr Diode State Manangement Framework</Title>
-    <Authors>Shaun Curtis</Authors>
-    <Company>Cold Elm Coders</Company>
-    <Description>A State Management System based on the Flux pattern</Description>
-    <Copyright>Use and Donate</Copyright>
-    <PackageReadmeFile>Package.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/ShaunCurtis/Blazr.Diode</RepositoryUrl>
-    <PackageReleaseNotes>Pre Realease Test Version</PackageReleaseNotes>
-    <AssemblyVersion>1.1.0</AssemblyVersion>
-    <FileVersion>1.1.0</FileVersion>
-    <Version>1.1.0</Version>
-    <PackageLicenseFile>license.txt</PackageLicenseFile>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="Composites\DiodeComposite.cs" />
-    <Compile Remove="Composites\DiodeCompositeData.cs" />
-    <Compile Remove="Composites\DiodeCompositeProvider.cs" />
-  </ItemGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Authors>Shaun Curtis</Authors>
+		<Company>Cold Elm Coders</Company>
+		<Description>A Read Only Data Pipeline</Description>
+		<Copyright>Use and Donate</Copyright>
+		<PackageReadmeFile>Package.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/ShaunCurtis/Blazr.Diode</RepositoryUrl>
+		<PackageReleaseNotes>Pre Release Version</PackageReleaseNotes>
+		<AssemblyVersion>2.0.0</AssemblyVersion>
+		<FileVersion>2.0.0</FileVersion>
+		<PackageLicenseFile>license.txt</PackageLicenseFile>
+		<Version>2.0.0</Version>
+	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Blazr.Core" Version="1.0.2" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.Forms" Version="7.0.12" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="license.txt">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
-	  <None Update="Package.md">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
+		<None Update="license.txt">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Update="Package.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
 	</ItemGroup>
 
 </Project>

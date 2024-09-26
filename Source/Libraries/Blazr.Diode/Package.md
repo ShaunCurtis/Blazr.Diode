@@ -1,3 +1,3 @@
-This package contains the objects for using Blazor Diode to manage State.
-
-See the Repo for details -  https://github.com/ShaunCurtis/Blazr.Diode
+This package contains the Blazr One Way Street data pipeline.
+See the Repo -  https://github.com/ShaunCurtis/Blazr.Diode
+See the Revision document = https://github.com/ShaunCurtis/Blazr.Diode/blob/master/Versions.md
