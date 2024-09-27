@@ -6,12 +6,12 @@
 
 using Blazr.App.Core;
 using Blazr.App.Infrastructure;
-using Blazr.OneWayStreet.Core;
+using Blazr.Diode.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Blazr.Test;
+namespace Blazr.Diode.Test;
 
 public class MappedWeatherForecastTests
 {
@@ -20,13 +20,15 @@ public class MappedWeatherForecastTests
     public MappedWeatherForecastTests()
         => _testDataProvider = TestDataProvider.Instance();
 
-    private ServiceProvider GetServiceProvider()
+    private IServiceProvider GetServiceProvider()
     {
         var services = new ServiceCollection();
         services.AddAppServerMappedInfrastructureServices();
         services.AddLogging(builder => builder.AddDebug());
 
-        var provider = services.BuildServiceProvider();
+        // Create the Root and then a Scoped Provider
+        var rootProvider = services.BuildServiceProvider();
+        var provider = rootProvider.CreateAsyncScope().ServiceProvider;
 
         // get the DbContext factory and add the test data
         var factory = provider.GetService<IDbContextFactory<InMemoryTestDbContext>>();
