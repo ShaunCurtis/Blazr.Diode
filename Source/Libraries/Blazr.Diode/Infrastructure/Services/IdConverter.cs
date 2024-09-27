@@ -10,7 +10,7 @@ public class IdConverter : IIdConverter
 {
     public object Convert(object value)
     {
-        if (this.TryConvert(value,out object? outValue))
+        if (this.TryConvert(value, out object? outValue))
             return outValue;
 
         return value;
@@ -18,9 +18,17 @@ public class IdConverter : IIdConverter
 
     public bool TryConvert(object inValue, [NotNullWhen(true)] out object? outValue)
     {
+        //TODO -  use switch statement detect int long guid etc and return
+
+        if (inValue is IRecordId id)
+        {
+            outValue = id.GetKeyObject();
+            return true;
+        }
+
         if (long.TryParse(inValue.ToString(), out long longValue))
         {
-            outValue =    longValue;
+            outValue = longValue;
             return true;
         }
 

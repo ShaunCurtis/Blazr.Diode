@@ -1,6 +1,6 @@
-# One Way Street
+# Diode
 
-One Way Street is a read only data pipeline loosely based on CQS [Command/Query Separation] pattern.  This article provides an introduction and demonstrates it's usage using XUnit tests.
+*Diode* is data pipeline loosely based on the CQS [Command/Query Separation] pattern.  This article provides an introduction and demonstrates it's usage using XUnit tests.
 
 It's available as a Nuget Package - [Blazr.OneWayStreet](https://www.nuget.org/packages/Blazr.OneWayStreet).
 
@@ -25,11 +25,11 @@ public interface IDataBroker
 }
 ```
 
-Each method accepts a *Request* object that provides the data required, and returns a *Result* object.
+Each method accepts a *Request* object providing the data required to execute the request, and returns a *Result* object.
 
-`ExecuteQueryAsync` has two forms.  One returning a single `TRecord` item, and one a collection of `TRecord`'s.
+`ExecuteQueryAsync` has two forms.  Pass an `ItemQueryRequest` and get a a single `TRecord` item, or a `ListQueryRequest` and get `TRecord` collection.
 
-`ExecuteCommandAsync` has a single form.  The command type [Add/Update/Delete] is defined in the `CommandRequest`.  
+`ExecuteCommandAsync` executes an *Add/Update/Delete* defined in the `CommandRequest`.  
 
 ```csharp
 public record struct CommandRequest<TRecord>(TRecord Item, CommandState State, CancellationToken Cancellation = new());
@@ -43,7 +43,9 @@ public enum CommandState
 }
 ```
 
-The library provides a server based implementation of the pattern over Entity Framework Core.  
+The library provides two implementations:
+ - A server based implementation of the pattern over Entity Framework Core.
+ - An API implementation.  
 
 ### Service Definitions
 
